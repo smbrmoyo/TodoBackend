@@ -9,7 +9,7 @@ import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { ResponseStatus } from "../../types/enums";
 import { FetchTodosResponse, TodoResponse } from "../../types/responses";
 import { dynamoDBClient } from "../db";
-import { Todo } from "../../types/models";
+import { HttpError, Todo } from "../../types/models";
 import { DEFAULTTODO } from "../../types/defaultValues";
 
 /**
@@ -25,7 +25,6 @@ export async function fetchTodos(
   completed?: string,
   sortBy?: string
 ): Promise<FetchTodosResponse> {
-  console.log(sortBy);
   const params: QueryCommandInput = {
     TableName: "TodoTable",
     Limit: 20,
@@ -98,15 +97,21 @@ export async function getTodoById(id: string): Promise<TodoResponse> {
     return {
       data: DEFAULTTODO,
       status: ResponseStatus.FAILURE,
-      error:
-        "One or more parameter values are not valid. The AttributeValue for a key attribute cannot contain an empty string value. Key: id",
+      error: {
+        statusCode: 404,
+        message:
+          "One or more parameter values are not valid. The AttributeValue for a key attribute cannot contain an empty string value. Key: id",
+      },
     };
   } catch (error) {
     console.log("Error getting post:\n", error);
     return {
       data: DEFAULTTODO,
       status: ResponseStatus.FAILURE,
-      error: error,
+      error: {
+        statusCode: 404,
+        message: (error as Error).message,
+      },
     };
   }
 }

@@ -19,7 +19,6 @@ const defaultValues_1 = require("../../types/defaultValues");
 function fetchTodos(lastKey, completed, sortBy) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
-        console.log(sortBy);
         const params = {
             TableName: "TodoTable",
             Limit: 20,
@@ -86,7 +85,10 @@ function getTodoById(id) {
             return {
                 data: defaultValues_1.DEFAULTTODO,
                 status: enums_1.ResponseStatus.FAILURE,
-                error: "One or more parameter values are not valid. The AttributeValue for a key attribute cannot contain an empty string value. Key: id",
+                error: {
+                    statusCode: 404,
+                    message: "One or more parameter values are not valid. The AttributeValue for a key attribute cannot contain an empty string value. Key: id",
+                },
             };
         }
         catch (error) {
@@ -94,7 +96,10 @@ function getTodoById(id) {
             return {
                 data: defaultValues_1.DEFAULTTODO,
                 status: enums_1.ResponseStatus.FAILURE,
-                error: error,
+                error: {
+                    statusCode: 404,
+                    message: error.message,
+                },
             };
         }
     });

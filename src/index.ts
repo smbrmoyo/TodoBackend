@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import { createServer } from "http";
 
 import {
@@ -12,16 +12,15 @@ import { createTodoTable } from "./db/handlers/tableHandlers";
 import { createTodo } from "./db/handlers/POSTHandlers";
 import { updateTodo } from "./db/handlers/PUTHandlers";
 import { deleteTodo } from "./db/handlers/DELETEHandlers";
-
-import { awsRegion, awsAccessKeyId, awsSecretAccessKey } from "./utils/config";
+import { errorHandler } from "./utils/errorHandling";
+import { HttpError } from "./types/models";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
 const httpServer = createServer(app);
 
-console.log(`Region ${awsRegion} \n\n\n\n`);
-
 app.use(express.json());
+app.use(errorHandler);
 
 (async () => {
   try {
@@ -41,8 +40,9 @@ app.get("/", async (req: Request, res: Response) => {
 app.get("/tasks", async (req: Request, res: Response) => {
   const { lastKey, completed, sort_by } = req.query;
 
-  const lastKeyString = typeof lastKey === "string" ? lastKey : undefined;
-  const completedString = typeof completed === "string" ? completed : undefined;
+  const lastKeyString = lastKey != "" ? lastKey : undefined;
+  const completedString =
+    typeof completed === "string" && completed != "" ? completed : undefined;
   const sortByString = typeof sort_by === "string" ? sort_by : undefined;
 
   const result: FetchTodosResponse = await fetchTodos(
@@ -50,7 +50,7 @@ app.get("/tasks", async (req: Request, res: Response) => {
     completedString,
     sortByString
   );
-
+  console.log(result.data.length);
   if (result.status != ResponseStatus.FAILURE) {
     res.status(200).json(result);
   } else {
@@ -58,17 +58,24 @@ app.get("/tasks", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/tasks/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
+app.get(
+  "/tasks/:id",
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      const result: TodoResponse = await getTodoById(id);
 
-  const result: TodoResponse = await getTodoById(id);
-
-  if (result.status != ResponseStatus.FAILURE) {
-    res.status(200).json(result);
-  } else {
-    res.status(400).json(result);
+      if (result.status === "FAILURE") {
+        throw new HttpError(result.error || "Item not found", 404);
+      }
+      res.status(200).json(result);
+    } catch (error) {
+      let err = error as HttpError;
+      res.status(err.statusCode).json(err.message);
+      // next(error as HttpError);
+    }
   }
-});
+);
 
 app.post("/tasks", async (req: Request, res: Response) => {
   const { taskDescription, dueDate, completed } = req.body;

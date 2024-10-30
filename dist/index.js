@@ -20,10 +20,13 @@ const tableHandlers_1 = require("./db/handlers/tableHandlers");
 const POSTHandlers_1 = require("./db/handlers/POSTHandlers");
 const PUTHandlers_1 = require("./db/handlers/PUTHandlers");
 const DELETEHandlers_1 = require("./db/handlers/DELETEHandlers");
+const errorHandling_1 = require("./utils/errorHandling");
+const models_1 = require("./types/models");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 const httpServer = (0, http_1.createServer)(app);
 app.use(express_1.default.json());
+app.use(errorHandling_1.errorHandler);
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, tableHandlers_1.createTodoTable)();
@@ -38,10 +41,11 @@ app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 app.get("/tasks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { lastKey, completed, sort_by } = req.query;
-    const lastKeyString = typeof lastKey === "string" ? lastKey : undefined;
-    const completedString = typeof completed === "string" ? completed : undefined;
+    const lastKeyString = lastKey != "" ? lastKey : undefined;
+    const completedString = typeof completed === "string" && completed != "" ? completed : undefined;
     const sortByString = typeof sort_by === "string" ? sort_by : undefined;
     const result = yield (0, GETHandlers_1.fetchTodos)(lastKeyString, completedString, sortByString);
+    console.log(result.data.length);
     if (result.status != enums_1.ResponseStatus.FAILURE) {
         res.status(200).json(result);
     }
@@ -49,14 +53,18 @@ app.get("/tasks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(400).json(result);
     }
 }));
-app.get("/tasks/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.get("/tasks/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield (0, GETHandlers_1.getTodoById)(id);
-    if (result.status != enums_1.ResponseStatus.FAILURE) {
+    try {
+        const result = yield (0, GETHandlers_1.getTodoById)(id);
+        if (result.status === "FAILURE") {
+            throw new models_1.HttpError(result.error || "Item not found", 404);
+        }
         res.status(200).json(result);
     }
-    else {
-        res.status(400).json(result);
+    catch (error) {
+        let err = error;
+        res.status(err.statusCode).json(err.message);
     }
 }));
 app.post("/tasks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
