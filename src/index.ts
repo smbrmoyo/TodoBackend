@@ -1,8 +1,12 @@
 import express, { Express, Request, Response } from "express";
 import { createServer } from "http";
 
-import { DeleteTodoResponse, TodoResponse } from "./types/responses";
-import { getTodoById } from "./db/handlers/GETHandlers";
+import {
+  DeleteTodoResponse,
+  FetchTodosResponse,
+  TodoResponse,
+} from "./types/responses";
+import { fetchTodos, getTodoById } from "./db/handlers/GETHandlers";
 import { ResponseStatus } from "./types/enums";
 import { createTodoTable } from "./db/handlers/tableHandlers";
 import { createTodo } from "./db/handlers/POSTHandlers";
@@ -28,6 +32,26 @@ app.get("/", async (req: Request, res: Response) => {
   res.send(
     "Server Running.\nUse the correct API endpoint path to access resource"
   );
+});
+
+app.get("/tasks", async (req: Request, res: Response) => {
+  const { lastKey, completed, sort_by } = req.query;
+
+  const lastKeyString = typeof lastKey === "string" ? lastKey : undefined;
+  const completedString = typeof completed === "string" ? completed : undefined;
+  const sortByString = typeof sort_by === "string" ? sort_by : undefined;
+
+  const result: FetchTodosResponse = await fetchTodos(
+    lastKeyString,
+    completedString,
+    sortByString
+  );
+
+  if (result.status != ResponseStatus.FAILURE) {
+    res.status(200).json(result);
+  } else {
+    res.status(400).json(result);
+  }
 });
 
 app.get("/tasks/:id", async (req: Request, res: Response) => {

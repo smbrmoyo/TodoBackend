@@ -9,12 +9,65 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.fetchTodos = fetchTodos;
 exports.getTodoById = getTodoById;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
 const util_dynamodb_1 = require("@aws-sdk/util-dynamodb");
 const enums_1 = require("../../types/enums");
 const db_1 = require("../db");
 const defaultValues_1 = require("../../types/defaultValues");
+function fetchTodos(lastKey, completed, sortBy) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        let indexName = "";
+        const params = {
+            TableName: "TodoTable",
+            Limit: 20,
+            ExclusiveStartKey: lastKey == "" ? undefined : lastKey,
+            ScanIndexForward: (_a = sortBy === null || sortBy === void 0 ? void 0 : sortBy.startsWith("+")) !== null && _a !== void 0 ? _a : undefined,
+        };
+        if (completed == undefined) {
+            indexName = (sortBy === null || sortBy === void 0 ? void 0 : sortBy.includes("dueDate"))
+                ? "AllDueDateIndex"
+                : "AllCreatedDateIndex";
+            params.IndexName = indexName;
+            params.KeyConditionExpression = "type = :type";
+            params.ExpressionAttributeValues = { ":type": (0, util_dynamodb_1.marshall)("Todo") };
+        }
+        else {
+            indexName = (sortBy === null || sortBy === void 0 ? void 0 : sortBy.includes("dueDate"))
+                ? "CompleteDueDateIndex"
+                : "CompleteCreatedDateIndex";
+            params.KeyConditionExpression = "completed = :completed";
+            params.ExpressionAttributeValues = { ":complete": (0, util_dynamodb_1.marshall)(completed) };
+        }
+        try {
+            const result = yield db_1.dynamoDBClient.send(new client_dynamodb_1.QueryCommand(params));
+            if (result.Items != undefined && result.Items.length > 0) {
+                return {
+                    data: result.Items.map((item) => (0, util_dynamodb_1.unmarshall)(item)),
+                    lastEvaluatedKey: result.LastEvaluatedKey,
+                    status: enums_1.ResponseStatus.SUCCESS,
+                };
+            }
+            else {
+                return {
+                    data: [],
+                    lastEvaluatedKey: undefined,
+                    status: enums_1.ResponseStatus.SUCCESSEMPTY,
+                };
+            }
+        }
+        catch (error) {
+            console.log("Error fetching Todos:\n", error);
+            return {
+                data: [],
+                status: enums_1.ResponseStatus.FAILURE,
+                error: error,
+            };
+        }
+    });
+}
 function getTodoById(id) {
     return __awaiter(this, void 0, void 0, function* () {
         const params = {

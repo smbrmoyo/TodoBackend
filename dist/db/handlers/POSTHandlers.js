@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTodo = createTodo;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
-const util_dynamodb_1 = require("@aws-sdk/util-dynamodb");
 const uuid_1 = require("uuid");
 const enums_1 = require("../../types/enums");
 const db_1 = require("../db");
@@ -29,7 +28,14 @@ function createTodo(taskDescription, dueDate, completed) {
         };
         const params = {
             TableName: "TodoTable",
-            Item: (0, util_dynamodb_1.marshall)(newTodo),
+            Item: {
+                id: { S: newTodo.id },
+                taskDescription: { S: newTodo.taskDescription },
+                dueDate: { S: newTodo.dueDate },
+                completed: { S: newTodo.completed },
+                createdDate: { S: newTodo.createdDate },
+                type: { S: "Todo" },
+            },
         };
         try {
             yield db_1.dynamoDBClient.send(new client_dynamodb_1.PutItemCommand(params));

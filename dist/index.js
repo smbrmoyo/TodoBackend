@@ -36,6 +36,16 @@ app.use(express_1.default.json());
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send("Server Running.\nUse the correct API endpoint path to access resource");
 }));
+app.get("/tasks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { lastKey, completed, sortBy } = req.params;
+    const result = yield (0, GETHandlers_1.fetchTodos)(lastKey, completed, sortBy);
+    if (result.status != enums_1.ResponseStatus.FAILURE) {
+        res.status(200).json(result);
+    }
+    else {
+        res.status(400).json(result);
+    }
+}));
 app.get("/tasks/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield (0, GETHandlers_1.getTodoById)(id);

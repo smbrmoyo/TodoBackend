@@ -1,5 +1,4 @@
 import { PutItemCommandInput, PutItemCommand } from "@aws-sdk/client-dynamodb";
-import { marshall } from "@aws-sdk/util-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 
 import { ResponseStatus } from "../../types/enums";
@@ -34,7 +33,14 @@ export async function createTodo(
 
   const params: PutItemCommandInput = {
     TableName: "TodoTable",
-    Item: marshall(newTodo),
+    Item: {
+      id: { S: newTodo.id },
+      taskDescription: { S: newTodo.taskDescription },
+      dueDate: { S: newTodo.dueDate },
+      completed: { S: newTodo.completed },
+      createdDate: { S: newTodo.createdDate },
+      type: { S: "Todo" },
+    },
   };
 
   try {

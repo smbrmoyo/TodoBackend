@@ -1,11 +1,78 @@
-import { GetItemCommandInput, GetItemCommand } from "@aws-sdk/client-dynamodb";
+import {
+  GetItemCommandInput,
+  GetItemCommand,
+  QueryCommand,
+  QueryCommandInput,
+} from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 import { ResponseStatus } from "../../types/enums";
-import { TodoResponse } from "../../types/responses";
+import { FetchTodosResponse, TodoResponse } from "../../types/responses";
 import { dynamoDBClient } from "../db";
 import { Todo } from "../../types/models";
 import { DEFAULTTODO } from "../../types/defaultValues";
+
+/**
+ * Fetches all Todos from the DynamoDB table "TodoTable" with optional filtering and sorting using GSIs.
+ *
+ * @param {any} lastKey The last evaluated key from the previous query, used for pagination
+ * @param {completed | undefined} completed Filter for completed status.
+ * @param {string | undefined} sortBy Optional sorting parameter.
+ * @returns A promise that resolves to `FetchTodosResponse` or an error message.
+ */
+export async function fetchTodos(
+  lastKey: any,
+  completed?: string,
+  sortBy?: string
+): Promise<FetchTodosResponse> {
+  console.log(sortBy);
+  const params: QueryCommandInput = {
+    TableName: "TodoTable",
+    Limit: 20,
+    ExclusiveStartKey: lastKey == "" ? undefined : lastKey,
+    ScanIndexForward: sortBy?.startsWith(" ") ?? undefined,
+  };
+
+  if (completed == undefined) {
+    params.IndexName = sortBy?.includes("dueDate")
+      ? "AllDueDateIndex"
+      : "AllCreatedIndex";
+    params.KeyConditionExpression = "#type = :typeName";
+    params.ExpressionAttributeValues = { ":typeName": marshall("Todo") };
+    params.ExpressionAttributeNames = { "#type": "type" };
+  } else {
+    params.IndexName = sortBy?.includes("dueDate")
+      ? "CompleteDueDateIndex"
+      : "CompleteCreatedDateIndex";
+    params.KeyConditionExpression = "completed = :completed";
+    params.ExpressionAttributeValues = { ":completed": marshall(completed) };
+  }
+
+  try {
+    const result = await dynamoDBClient.send(new QueryCommand(params));
+
+    if (result.Items != undefined && result.Items!.length > 0) {
+      return {
+        data: result.Items.map((item) => unmarshall(item) as Todo),
+        lastEvaluatedKey: result.LastEvaluatedKey,
+        status: ResponseStatus.SUCCESS,
+      };
+    } else {
+      return {
+        data: [],
+        lastEvaluatedKey: undefined,
+        status: ResponseStatus.SUCCESSEMPTY,
+      };
+    }
+  } catch (error) {
+    console.log("Error fetching Todos:\n", error);
+    return {
+      data: [],
+      status: ResponseStatus.FAILURE,
+      error: error,
+    };
+  }
+}
 
 /**
  * Fetches a Todo from the DynamoDB table "TodoTable" using its ID.

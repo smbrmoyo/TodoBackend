@@ -26,39 +26,49 @@ export async function createTodoTable() {
           { AttributeName: "dueDate", AttributeType: "S" },
           { AttributeName: "completed", AttributeType: "S" },
           { AttributeName: "createdDate", AttributeType: "S" },
+          { AttributeName: "type", AttributeType: "S" },
         ],
         KeySchema: [{ AttributeName: "id", KeyType: "HASH" }],
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
+        BillingMode: "PAY_PER_REQUEST",
         GlobalSecondaryIndexes: [
           {
-            IndexName: "DueDateIndex",
+            IndexName: "CompleteDueDateIndex",
             KeySchema: [
-              { AttributeName: "dueDate", KeyType: "HASH" },
-              { AttributeName: "completed", KeyType: "RANGE" },
+              { AttributeName: "completed", KeyType: "HASH" },
+              { AttributeName: "dueDate", KeyType: "RANGE" },
             ],
             Projection: {
               ProjectionType: "ALL",
-            },
-            ProvisionedThroughput: {
-              ReadCapacityUnits: 5,
-              WriteCapacityUnits: 5,
             },
           },
           {
-            IndexName: "CreatedDateIndex",
+            IndexName: "CompleteCreatedDateIndex",
             KeySchema: [
-              { AttributeName: "createdDate", KeyType: "HASH" },
-              { AttributeName: "completed", KeyType: "RANGE" },
+              { AttributeName: "completed", KeyType: "HASH" },
+              { AttributeName: "createdDate", KeyType: "RANGE" },
             ],
             Projection: {
               ProjectionType: "ALL",
             },
-            ProvisionedThroughput: {
-              ReadCapacityUnits: 5,
-              WriteCapacityUnits: 5,
+          },
+          {
+            IndexName: "AllCreatedIndex",
+            KeySchema: [
+              { AttributeName: "type", KeyType: "HASH" },
+              { AttributeName: "createdDate", KeyType: "RANGE" },
+            ],
+            Projection: {
+              ProjectionType: "ALL",
+            },
+          },
+          {
+            IndexName: "AllDueDateIndex",
+            KeySchema: [
+              { AttributeName: "type", KeyType: "HASH" },
+              { AttributeName: "dueDate", KeyType: "RANGE" },
+            ],
+            Projection: {
+              ProjectionType: "ALL",
             },
           },
         ],
