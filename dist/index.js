@@ -14,12 +14,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const http_1 = require("http");
+const GETHandlers_1 = require("./db/handlers/GETHandlers");
+const enums_1 = require("./types/enums");
+const tableHandlers_1 = require("./db/handlers/tableHandlers");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 const httpServer = (0, http_1.createServer)(app);
 app.use(express_1.default.json());
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, tableHandlers_1.createTodoTable)();
+        console.log("DynamoDB table initialized.");
+    }
+    catch (error) {
+        console.error("Error initializing DynamoDB table:", error);
+        process.exit(1);
+    }
+}))();
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send("Server Running.\nUse the correct API endpoint path to access resource");
+}));
+app.get("/tasks/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield (0, GETHandlers_1.getTodoById)(id);
+    if (result.status != enums_1.ResponseStatus.FAILURE) {
+        res.status(200).json(result);
+    }
+    else {
+        res.status(400).json(result);
+    }
 }));
 httpServer.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

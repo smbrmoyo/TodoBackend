@@ -4,7 +4,7 @@ import {
   CreateTableCommand,
 } from "@aws-sdk/client-dynamodb";
 
-import { dynamoDBClient } from "./db";
+import { dynamoDBClient } from "../db";
 
 export async function createTodoTable() {
   const tableName = "TodoTable";
@@ -24,7 +24,7 @@ export async function createTodoTable() {
         AttributeDefinitions: [
           { AttributeName: "id", AttributeType: "S" },
           { AttributeName: "dueDate", AttributeType: "S" },
-          { AttributeName: "completed", AttributeType: "B" },
+          { AttributeName: "completed", AttributeType: "S" },
           { AttributeName: "createdDate", AttributeType: "S" },
         ],
         KeySchema: [{ AttributeName: "id", KeyType: "HASH" }],

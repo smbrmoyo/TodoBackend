@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTodoTable = createTodoTable;
 const client_dynamodb_1 = require("@aws-sdk/client-dynamodb");
-const db_1 = require("./db");
+const db_1 = require("../db");
 function createTodoTable() {
     return __awaiter(this, void 0, void 0, function* () {
         const tableName = "TodoTable";
@@ -27,7 +27,7 @@ function createTodoTable() {
                     AttributeDefinitions: [
                         { AttributeName: "id", AttributeType: "S" },
                         { AttributeName: "dueDate", AttributeType: "S" },
-                        { AttributeName: "completed", AttributeType: "B" },
+                        { AttributeName: "completed", AttributeType: "S" },
                         { AttributeName: "createdDate", AttributeType: "S" },
                     ],
                     KeySchema: [{ AttributeName: "id", KeyType: "HASH" }],
