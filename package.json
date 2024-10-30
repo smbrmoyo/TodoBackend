@@ -7,7 +7,7 @@
     "start": "node ./dist/index.js",
     "dev": "npm run build && nodemon",
     "build": "npm run clean && tsc",
-    "deploy": "gcloud run deploy $SERVICE --project=$PROJECT --region=$REGION --platform managed --allow-unauthenticated --source .",
+    "deploy": "gcloud run deploy $SERVICE --project=$PROJECT --region=$REGION --platform managed --allow-unauthenticated --source . --set-env-vars \"AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY,AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID,AWS_REGION=$AWS_REGION\"",
     "clean": "rimraf dist",
     "test": "jest --silent",
     "test:watch": "jest --watch",

@@ -37,8 +37,11 @@ app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send("Server Running.\nUse the correct API endpoint path to access resource");
 }));
 app.get("/tasks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { lastKey, completed, sortBy } = req.params;
-    const result = yield (0, GETHandlers_1.fetchTodos)(lastKey, completed, sortBy);
+    const { lastKey, completed, sort_by } = req.query;
+    const lastKeyString = typeof lastKey === "string" ? lastKey : undefined;
+    const completedString = typeof completed === "string" ? completed : undefined;
+    const sortByString = typeof sort_by === "string" ? sort_by : undefined;
+    const result = yield (0, GETHandlers_1.fetchTodos)(lastKeyString, completedString, sortByString);
     if (result.status != enums_1.ResponseStatus.FAILURE) {
         res.status(200).json(result);
     }

@@ -13,9 +13,13 @@ import { createTodo } from "./db/handlers/POSTHandlers";
 import { updateTodo } from "./db/handlers/PUTHandlers";
 import { deleteTodo } from "./db/handlers/DELETEHandlers";
 
+import { awsRegion, awsAccessKeyId, awsSecretAccessKey } from "./utils/config";
+
 const app: Express = express();
 const port = process.env.PORT || 3000;
 const httpServer = createServer(app);
+
+console.log(`Region ${awsRegion} \n\n\n\n`);
 
 app.use(express.json());
 

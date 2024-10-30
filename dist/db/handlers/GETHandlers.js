@@ -19,27 +19,27 @@ const defaultValues_1 = require("../../types/defaultValues");
 function fetchTodos(lastKey, completed, sortBy) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
-        let indexName = "";
+        console.log(sortBy);
         const params = {
             TableName: "TodoTable",
             Limit: 20,
             ExclusiveStartKey: lastKey == "" ? undefined : lastKey,
-            ScanIndexForward: (_a = sortBy === null || sortBy === void 0 ? void 0 : sortBy.startsWith("+")) !== null && _a !== void 0 ? _a : undefined,
+            ScanIndexForward: (_a = sortBy === null || sortBy === void 0 ? void 0 : sortBy.startsWith(" ")) !== null && _a !== void 0 ? _a : undefined,
         };
         if (completed == undefined) {
-            indexName = (sortBy === null || sortBy === void 0 ? void 0 : sortBy.includes("dueDate"))
+            params.IndexName = (sortBy === null || sortBy === void 0 ? void 0 : sortBy.includes("dueDate"))
                 ? "AllDueDateIndex"
-                : "AllCreatedDateIndex";
-            params.IndexName = indexName;
-            params.KeyConditionExpression = "type = :type";
-            params.ExpressionAttributeValues = { ":type": (0, util_dynamodb_1.marshall)("Todo") };
+                : "AllCreatedIndex";
+            params.KeyConditionExpression = "#type = :typeName";
+            params.ExpressionAttributeValues = { ":typeName": (0, util_dynamodb_1.marshall)("Todo") };
+            params.ExpressionAttributeNames = { "#type": "type" };
         }
         else {
-            indexName = (sortBy === null || sortBy === void 0 ? void 0 : sortBy.includes("dueDate"))
+            params.IndexName = (sortBy === null || sortBy === void 0 ? void 0 : sortBy.includes("dueDate"))
                 ? "CompleteDueDateIndex"
                 : "CompleteCreatedDateIndex";
             params.KeyConditionExpression = "completed = :completed";
-            params.ExpressionAttributeValues = { ":complete": (0, util_dynamodb_1.marshall)(completed) };
+            params.ExpressionAttributeValues = { ":completed": (0, util_dynamodb_1.marshall)(completed) };
         }
         try {
             const result = yield db_1.dynamoDBClient.send(new client_dynamodb_1.QueryCommand(params));
