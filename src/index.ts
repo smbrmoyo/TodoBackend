@@ -1,11 +1,12 @@
 import express, { Express, Request, Response } from "express";
 import { createServer } from "http";
 
-import { CreateTodo, GetTodoById } from "./types/responses";
+import { TodoResponse } from "./types/responses";
 import { getTodoById } from "./db/handlers/GETHandlers";
 import { ResponseStatus } from "./types/enums";
 import { createTodoTable } from "./db/handlers/tableHandlers";
 import { createTodo } from "./db/handlers/POSTHandlers";
+import { updateTodo } from "./db/handlers/PUTHandlers";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -16,7 +17,6 @@ app.use(express.json());
 (async () => {
   try {
     await createTodoTable();
-    console.log("DynamoDB table initialized.");
   } catch (error) {
     console.error("Error initializing DynamoDB table:", error);
     process.exit(1);
@@ -32,7 +32,7 @@ app.get("/", async (req: Request, res: Response) => {
 app.get("/tasks/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const result: GetTodoById = await getTodoById(id);
+  const result: TodoResponse = await getTodoById(id);
 
   if (result.status != ResponseStatus.FAILURE) {
     res.status(200).json(result);
@@ -44,7 +44,7 @@ app.get("/tasks/:id", async (req: Request, res: Response) => {
 app.post("/tasks", async (req: Request, res: Response) => {
   const { taskDescription, dueDate, completed } = req.body;
 
-  const result: CreateTodo = await createTodo(
+  const result: TodoResponse = await createTodo(
     taskDescription,
     dueDate,
     completed
@@ -52,6 +52,24 @@ app.post("/tasks", async (req: Request, res: Response) => {
 
   if (result.status != ResponseStatus.FAILURE) {
     res.status(201).json(result);
+  } else {
+    res.status(400).json(result);
+  }
+});
+
+app.put("/tasks/:id", async (req: Request, res: Response) => {
+  const { id, taskDescription, dueDate, createdDate, completed } = req.body;
+
+  const result: TodoResponse = await updateTodo(
+    id,
+    taskDescription,
+    dueDate,
+    createdDate,
+    completed
+  );
+
+  if (result.status != ResponseStatus.FAILURE) {
+    res.status(200).json(result);
   } else {
     res.status(400).json(result);
   }

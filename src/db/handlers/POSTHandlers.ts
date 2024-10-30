@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { ResponseStatus } from "../../types/enums";
 import { Todo } from "../../types/models";
-import { CreateTodo } from "../../types/responses";
+import { TodoResponse } from "../../types/responses";
 import { dynamoDBClient } from "../db";
 import { DEFAULTTODO } from "../../types/defaultValues";
 
@@ -14,13 +14,13 @@ import { DEFAULTTODO } from "../../types/defaultValues";
  * @param {string} taskDescription Description of the Task,
  * @param {string} dueDate Due date for Task.
  * @param {boolean} completed Status of the Task.
- * @returns A promise that resolves to a `CreateTodo` containing the data and status of the request.
+ * @returns A promise that resolves to a `TodoResponse` containing the data and status of the request.
  */
 export async function createTodo(
   taskDescription: string,
   dueDate: string,
   completed: boolean
-): Promise<CreateTodo> {
+): Promise<TodoResponse> {
   const id = uuidv4();
   const createdDate = new Date().toISOString();
 

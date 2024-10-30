@@ -2,7 +2,7 @@ import { GetItemCommandInput, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 import { ResponseStatus } from "../../types/enums";
-import { GetTodoById } from "../../types/responses";
+import { TodoResponse } from "../../types/responses";
 import { dynamoDBClient } from "../db";
 import { Todo } from "../../types/models";
 import { DEFAULTTODO } from "../../types/defaultValues";
@@ -11,9 +11,9 @@ import { DEFAULTTODO } from "../../types/defaultValues";
  * Fetches a Todo from the DynamoDB table "TodoTable" using its ID.
  *
  * @param {string} id ID of the Todo to get.
- * @returns A promise that resolves to a `GetTodoById` containing the data and status of the request.
+ * @returns A promise that resolves to a `TodoResponse` containing the data and status of the request.
  */
-export async function getTodoById(id: string): Promise<GetTodoById> {
+export async function getTodoById(id: string): Promise<TodoResponse> {
   const params: GetItemCommandInput = {
     Key: marshall({ id: id }),
     TableName: "TodoTable",
