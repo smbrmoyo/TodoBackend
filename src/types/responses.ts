@@ -6,3 +6,8 @@ export interface TodoResponse {
   status: ResponseStatus;
   error?: any;
 }
+
+export interface DeleteTodoResponse {
+  status: ResponseStatus;
+  error?: any;
+}

@@ -1,12 +1,13 @@
 import express, { Express, Request, Response } from "express";
 import { createServer } from "http";
 
-import { TodoResponse } from "./types/responses";
+import { DeleteTodoResponse, TodoResponse } from "./types/responses";
 import { getTodoById } from "./db/handlers/GETHandlers";
 import { ResponseStatus } from "./types/enums";
 import { createTodoTable } from "./db/handlers/tableHandlers";
 import { createTodo } from "./db/handlers/POSTHandlers";
 import { updateTodo } from "./db/handlers/PUTHandlers";
+import { deleteTodo } from "./db/handlers/DELETEHandlers";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -67,6 +68,18 @@ app.put("/tasks/:id", async (req: Request, res: Response) => {
     createdDate,
     completed
   );
+
+  if (result.status != ResponseStatus.FAILURE) {
+    res.status(200).json(result);
+  } else {
+    res.status(400).json(result);
+  }
+});
+
+app.delete("/tasks/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result: DeleteTodoResponse = await deleteTodo(id);
 
   if (result.status != ResponseStatus.FAILURE) {
     res.status(200).json(result);
