@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "CommonJS",
+    "isolatedModules": true,
+    "outDir": "./dist",
+    "noEmitOnError": true,
+    "removeComments": true
+  },
+  "rootDir": "./src",
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "tests/**/*.ts"]
+}
