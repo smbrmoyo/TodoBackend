@@ -17,6 +17,7 @@ const http_1 = require("http");
 const GETHandlers_1 = require("./db/handlers/GETHandlers");
 const enums_1 = require("./types/enums");
 const tableHandlers_1 = require("./db/handlers/tableHandlers");
+const POSTHandlers_1 = require("./db/handlers/POSTHandlers");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 const httpServer = (0, http_1.createServer)(app);
@@ -37,6 +38,16 @@ app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 app.get("/tasks/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const result = yield (0, GETHandlers_1.getTodoById)(id);
+    if (result.status != enums_1.ResponseStatus.FAILURE) {
+        res.status(200).json(result);
+    }
+    else {
+        res.status(400).json(result);
+    }
+}));
+app.post("/tasks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { taskDescription, dueDate, completed } = req.body;
+    const result = yield (0, POSTHandlers_1.createTodo)(taskDescription, dueDate, completed);
     if (result.status != enums_1.ResponseStatus.FAILURE) {
         res.status(200).json(result);
     }

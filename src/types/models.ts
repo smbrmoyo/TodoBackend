@@ -2,7 +2,7 @@
 
 export interface Todo {
   id: string;
-  taskDecription: string;
+  taskDescription: string;
   dueDate: string;
   createdDate: string;
   completed: string;

@@ -6,3 +6,9 @@ export interface GetTodoById {
   status: ResponseStatus;
   error?: any;
 }
+
+export interface CreateTodo {
+  data: Todo;
+  status: ResponseStatus;
+  error?: any;
+}
