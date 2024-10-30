@@ -5,3 +5,6 @@ package-lock.json
 
 # Google Cloud Config
 .cloudconfig
+
+# Environment
+.env
