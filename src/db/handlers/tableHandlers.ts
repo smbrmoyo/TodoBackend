@@ -6,7 +6,15 @@ import {
 
 import { dynamoDBClient } from "../db";
 
-export async function createTodoTable() {
+/**
+ * Creates a DynamoDB table named "TodoTable" if it does not already exist.
+ *
+ * @returns {Promise<void>} A promise that resolves when the table is
+ * created or exists.
+ * @throws {Error} Throws an error if there is an issue checking for the
+ * table's existence or creating it.
+ */
+export async function createTodoTable(): Promise<void> {
   const tableName = "TodoTable";
 
   try {

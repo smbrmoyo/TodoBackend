@@ -8,7 +8,10 @@
     "dev": "npm run build && nodemon",
     "build": "npm run clean && tsc",
     "deploy": "gcloud run deploy $SERVICE --project=$PROJECT --region=$REGION --platform managed --allow-unauthenticated --source .",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "test": "jest --silent",
+    "test:watch": "jest --watch",
+    "test:unit": "jest tests/unit --silent"
   },
   "keywords": [],
   "author": "Brian Moyou",
