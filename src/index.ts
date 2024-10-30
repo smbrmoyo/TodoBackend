@@ -50,7 +50,7 @@ app.get("/tasks", async (req: Request, res: Response) => {
     completedString,
     sortByString
   );
-  console.log(result.data.length);
+
   if (result.status != ResponseStatus.FAILURE) {
     res.status(200).json(result);
   } else {
@@ -78,11 +78,12 @@ app.get(
 );
 
 app.post("/tasks", async (req: Request, res: Response) => {
-  const { taskDescription, dueDate, completed } = req.body;
+  const { taskDescription, dueDate, createdDate, completed } = req.body;
 
   const result: TodoResponse = await createTodo(
     taskDescription,
     dueDate,
+    createdDate,
     completed
   );
 

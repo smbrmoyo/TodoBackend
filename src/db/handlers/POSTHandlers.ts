@@ -12,22 +12,23 @@ import { DEFAULTTODO } from "../../types/defaultValues";
  *
  * @param {string} taskDescription Description of the Task,
  * @param {string} dueDate Due date for Task.
- * @param {boolean} completed Status of the Task.
+ * @param {string} dueDate Creation date for Task.
+ * @param {string} completed Status of the Task.
  * @returns A promise that resolves to a `TodoResponse` containing the data and status of the request.
  */
 export async function createTodo(
   taskDescription: string,
   dueDate: string,
-  completed: boolean
+  createdDate: string,
+  completed: string
 ): Promise<TodoResponse> {
   const id = uuidv4();
-  const createdDate = new Date().toISOString();
 
   const newTodo: Todo = {
     id,
     taskDescription: taskDescription,
     dueDate: dueDate,
-    completed: String(completed),
+    completed: completed,
     createdDate,
   };
 
@@ -35,10 +36,10 @@ export async function createTodo(
     TableName: "TodoTable",
     Item: {
       id: { S: newTodo.id },
-      taskDescription: { S: newTodo.taskDescription },
-      dueDate: { S: newTodo.dueDate },
-      completed: { S: newTodo.completed },
-      createdDate: { S: newTodo.createdDate },
+      taskDescription: { S: taskDescription },
+      dueDate: { S: dueDate },
+      completed: { S: completed },
+      createdDate: { S: createdDate },
       type: { S: "Todo" },
     },
   };

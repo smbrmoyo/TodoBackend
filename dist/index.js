@@ -45,7 +45,6 @@ app.get("/tasks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const completedString = typeof completed === "string" && completed != "" ? completed : undefined;
     const sortByString = typeof sort_by === "string" ? sort_by : undefined;
     const result = yield (0, GETHandlers_1.fetchTodos)(lastKeyString, completedString, sortByString);
-    console.log(result.data.length);
     if (result.status != enums_1.ResponseStatus.FAILURE) {
         res.status(200).json(result);
     }
@@ -68,8 +67,8 @@ app.get("/tasks/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 }));
 app.post("/tasks", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { taskDescription, dueDate, completed } = req.body;
-    const result = yield (0, POSTHandlers_1.createTodo)(taskDescription, dueDate, completed);
+    const { taskDescription, dueDate, createdDate, completed } = req.body;
+    const result = yield (0, POSTHandlers_1.createTodo)(taskDescription, dueDate, createdDate, completed);
     if (result.status != enums_1.ResponseStatus.FAILURE) {
         res.status(201).json(result);
     }

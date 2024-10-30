@@ -27,7 +27,7 @@ export async function fetchTodos(
 ): Promise<FetchTodosResponse> {
   const params: QueryCommandInput = {
     TableName: "TodoTable",
-    Limit: 20,
+    Limit: 100,
     ExclusiveStartKey: lastKey == "" ? undefined : lastKey,
     ScanIndexForward: sortBy?.startsWith(" ") ?? undefined,
   };

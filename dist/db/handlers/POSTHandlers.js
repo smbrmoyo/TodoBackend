@@ -15,25 +15,24 @@ const uuid_1 = require("uuid");
 const enums_1 = require("../../types/enums");
 const db_1 = require("../db");
 const defaultValues_1 = require("../../types/defaultValues");
-function createTodo(taskDescription, dueDate, completed) {
+function createTodo(taskDescription, dueDate, createdDate, completed) {
     return __awaiter(this, void 0, void 0, function* () {
         const id = (0, uuid_1.v4)();
-        const createdDate = new Date().toISOString();
         const newTodo = {
             id,
             taskDescription: taskDescription,
             dueDate: dueDate,
-            completed: String(completed),
+            completed: completed,
             createdDate,
         };
         const params = {
             TableName: "TodoTable",
             Item: {
                 id: { S: newTodo.id },
-                taskDescription: { S: newTodo.taskDescription },
-                dueDate: { S: newTodo.dueDate },
-                completed: { S: newTodo.completed },
-                createdDate: { S: newTodo.createdDate },
+                taskDescription: { S: taskDescription },
+                dueDate: { S: dueDate },
+                completed: { S: completed },
+                createdDate: { S: createdDate },
                 type: { S: "Todo" },
             },
         };
