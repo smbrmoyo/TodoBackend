@@ -20,13 +20,11 @@ const tableHandlers_1 = require("./db/handlers/tableHandlers");
 const POSTHandlers_1 = require("./db/handlers/POSTHandlers");
 const PUTHandlers_1 = require("./db/handlers/PUTHandlers");
 const DELETEHandlers_1 = require("./db/handlers/DELETEHandlers");
-const errorHandling_1 = require("./utils/errorHandling");
 const models_1 = require("./types/models");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 const httpServer = (0, http_1.createServer)(app);
 app.use(express_1.default.json());
-app.use(errorHandling_1.errorHandler);
 (() => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, tableHandlers_1.createTodoTable)();

@@ -16,9 +16,11 @@ const enums_1 = require("../../types/enums");
 const db_1 = require("../db");
 function deleteTodo(id) {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a;
         const params = {
             TableName: "TodoTable",
             Key: (0, util_dynamodb_1.marshall)({ id }),
+            ConditionExpression: "attribute_exists(id)",
         };
         try {
             yield db_1.dynamoDBClient.send(new client_dynamodb_1.DeleteItemCommand(params));
@@ -31,8 +33,8 @@ function deleteTodo(id) {
             return {
                 status: enums_1.ResponseStatus.FAILURE,
                 error: {
-                    statusCode: 404,
-                    message: error.message,
+                    statusCode: ((_a = error.$metadata) === null || _a === void 0 ? void 0 : _a.httpStatusCode) || 400,
+                    message: error.message || "Unknown Error.",
                 },
             };
         }

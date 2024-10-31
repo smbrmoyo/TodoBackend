@@ -17,6 +17,7 @@ const db_1 = require("../db");
 const defaultValues_1 = require("../../types/defaultValues");
 function updateTodo(id, taskDescription, dueDate, createdDate, completed) {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a;
         const params = {
             TableName: "TodoTable",
             Key: (0, util_dynamodb_1.marshall)({ id }),
@@ -50,7 +51,10 @@ function updateTodo(id, taskDescription, dueDate, createdDate, completed) {
             return {
                 data: defaultValues_1.DEFAULTTODO,
                 status: enums_1.ResponseStatus.FAILURE,
-                error: error.message,
+                error: {
+                    statusCode: ((_a = error.$metadata) === null || _a === void 0 ? void 0 : _a.httpStatusCode) || 400,
+                    message: error.message || "Unknown Error.",
+                },
             };
         }
     });

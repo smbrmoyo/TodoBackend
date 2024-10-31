@@ -18,7 +18,7 @@ const db_1 = require("../db");
 const defaultValues_1 = require("../../types/defaultValues");
 function fetchTodos(lastKey, completed, sortBy) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a;
+        var _a, _b;
         const params = {
             TableName: "TodoTable",
             Limit: 2,
@@ -62,13 +62,17 @@ function fetchTodos(lastKey, completed, sortBy) {
             return {
                 data: [],
                 status: enums_1.ResponseStatus.FAILURE,
-                error: error,
+                error: {
+                    statusCode: ((_b = error.$metadata) === null || _b === void 0 ? void 0 : _b.httpStatusCode) || 400,
+                    message: error.message || "Unknown Error.",
+                },
             };
         }
     });
 }
 function getTodoById(id) {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a;
         const params = {
             Key: (0, util_dynamodb_1.marshall)({ id: id }),
             TableName: "TodoTable",
@@ -97,8 +101,8 @@ function getTodoById(id) {
                 data: defaultValues_1.DEFAULTTODO,
                 status: enums_1.ResponseStatus.FAILURE,
                 error: {
-                    statusCode: 404,
-                    message: error.message,
+                    statusCode: ((_a = error.$metadata) === null || _a === void 0 ? void 0 : _a.httpStatusCode) || 400,
+                    message: error.message || "Unknown Error.",
                 },
             };
         }
