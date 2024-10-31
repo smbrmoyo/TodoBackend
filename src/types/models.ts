@@ -8,7 +8,11 @@ export interface Todo {
   completed: string;
 }
 
-export interface LastKey {}
+export interface FetchTodosLastKey {
+  id: string;
+  type: string;
+  createdDate: string;
+}
 
 export class HttpError extends Error {
   public statusCode: number;

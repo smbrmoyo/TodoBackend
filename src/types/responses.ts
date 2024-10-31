@@ -1,9 +1,9 @@
 import { ResponseStatus } from "./enums";
-import { Todo } from "./models";
+import { FetchTodosLastKey, Todo } from "./models";
 
 export interface FetchTodosResponse {
   data: Todo[];
-  lastEvaluatedKey?: {};
+  lastEvaluatedKey?: FetchTodosLastKey | null;
   status: ResponseStatus;
   error?: any;
 }

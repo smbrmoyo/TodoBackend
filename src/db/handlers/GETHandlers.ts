@@ -9,30 +9,32 @@ import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { ResponseStatus } from "../../types/enums";
 import { FetchTodosResponse, TodoResponse } from "../../types/responses";
 import { dynamoDBClient } from "../db";
-import { DynamoDBError, Todo } from "../../types/models";
+import { DynamoDBError, FetchTodosLastKey, Todo } from "../../types/models";
 import { DEFAULTTODO } from "../../types/defaultValues";
 
 /**
  * Fetches all Todos from the DynamoDB table "TodoTable" with optional filtering and sorting using GSIs.
  *
- * @param {any} lastKey The last evaluated key from the previous query, used for pagination
- * @param {completed | undefined} completed Filter for completed status.
+ * @param {FetchTodosLastKey | null} lastKey The last evaluated key from the previous query, used for pagination
+ * @param {completed | null} completed Filter for completed status.
  * @param {string | undefined} sortBy Optional sorting parameter.
+ * @param {number} limit Amount of Tasks to fetch.
  * @returns A promise that resolves to `FetchTodosResponse` or an error message.
  */
 export async function fetchTodos(
-  lastKey: any,
-  completed?: string,
+  lastKey: FetchTodosLastKey | null,
+  completed: string | null,
+  limit: number,
   sortBy?: string
 ): Promise<FetchTodosResponse> {
   const params: QueryCommandInput = {
     TableName: "TodoTable",
-    Limit: 2,
-    ExclusiveStartKey: lastKey == "" ? undefined : lastKey,
-    ScanIndexForward: sortBy?.startsWith(" ") ?? undefined,
+    Limit: limit,
+    ExclusiveStartKey: lastKey ? marshall(lastKey) : undefined,
+    ScanIndexForward: sortBy?.startsWith("+") ?? undefined,
   };
 
-  if (completed == undefined) {
+  if (completed == null) {
     params.IndexName = sortBy?.includes("dueDate")
       ? "AllDueDateIndex"
       : "AllCreatedIndex";
@@ -53,7 +55,9 @@ export async function fetchTodos(
     if (result.Items != undefined && result.Items!.length > 0) {
       return {
         data: result.Items.map((item) => unmarshall(item) as Todo),
-        lastEvaluatedKey: result.LastEvaluatedKey,
+        lastEvaluatedKey: result.LastEvaluatedKey
+          ? (unmarshall(result.LastEvaluatedKey) as FetchTodosLastKey)
+          : null,
         status: ResponseStatus.SUCCESS,
       };
     } else {

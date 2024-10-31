@@ -35,18 +35,14 @@ app.get("/", async (req: Request, res: Response) => {
   );
 });
 
-app.get("/tasks", async (req: Request, res: Response) => {
-  const { lastKey, completed, sort_by } = req.query;
-
-  const lastKeyString = lastKey != "" ? lastKey : undefined;
-  const completedString =
-    typeof completed === "string" && completed != "" ? completed : undefined;
-  const sortByString = typeof sort_by === "string" ? sort_by : undefined;
+app.post("/tasks/fetch", async (req: Request, res: Response) => {
+  const { lastKey, completed, sort_by, limit } = req.body;
 
   const result: FetchTodosResponse = await fetchTodos(
-    lastKeyString,
-    completedString,
-    sortByString
+    lastKey,
+    completed,
+    limit,
+    sort_by
   );
 
   if (result.status != ResponseStatus.FAILURE) {

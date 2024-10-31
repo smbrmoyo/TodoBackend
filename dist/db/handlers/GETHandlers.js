@@ -16,16 +16,16 @@ const util_dynamodb_1 = require("@aws-sdk/util-dynamodb");
 const enums_1 = require("../../types/enums");
 const db_1 = require("../db");
 const defaultValues_1 = require("../../types/defaultValues");
-function fetchTodos(lastKey, completed, sortBy) {
+function fetchTodos(lastKey, completed, limit, sortBy) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a, _b;
         const params = {
             TableName: "TodoTable",
-            Limit: 2,
-            ExclusiveStartKey: lastKey == "" ? undefined : lastKey,
-            ScanIndexForward: (_a = sortBy === null || sortBy === void 0 ? void 0 : sortBy.startsWith(" ")) !== null && _a !== void 0 ? _a : undefined,
+            Limit: limit,
+            ExclusiveStartKey: lastKey ? (0, util_dynamodb_1.marshall)(lastKey) : undefined,
+            ScanIndexForward: (_a = sortBy === null || sortBy === void 0 ? void 0 : sortBy.startsWith("+")) !== null && _a !== void 0 ? _a : undefined,
         };
-        if (completed == undefined) {
+        if (completed == null) {
             params.IndexName = (sortBy === null || sortBy === void 0 ? void 0 : sortBy.includes("dueDate"))
                 ? "AllDueDateIndex"
                 : "AllCreatedIndex";
@@ -45,7 +45,9 @@ function fetchTodos(lastKey, completed, sortBy) {
             if (result.Items != undefined && result.Items.length > 0) {
                 return {
                     data: result.Items.map((item) => (0, util_dynamodb_1.unmarshall)(item)),
-                    lastEvaluatedKey: result.LastEvaluatedKey,
+                    lastEvaluatedKey: result.LastEvaluatedKey
+                        ? (0, util_dynamodb_1.unmarshall)(result.LastEvaluatedKey)
+                        : null,
                     status: enums_1.ResponseStatus.SUCCESS,
                 };
             }
