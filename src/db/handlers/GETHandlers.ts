@@ -55,7 +55,7 @@ export async function fetchTodos(
     if (result.Items != undefined && result.Items!.length > 0) {
       return {
         data: result.Items.map((item) => unmarshall(item) as Todo),
-        lastEvaluatedKey: result.LastEvaluatedKey
+        lastKey: result.LastEvaluatedKey
           ? (unmarshall(result.LastEvaluatedKey) as FetchTodosLastKey)
           : null,
         status: ResponseStatus.SUCCESS,
@@ -63,7 +63,7 @@ export async function fetchTodos(
     } else {
       return {
         data: [],
-        lastEvaluatedKey: undefined,
+        lastKey: undefined,
         status: ResponseStatus.SUCCESSEMPTY,
       };
     }

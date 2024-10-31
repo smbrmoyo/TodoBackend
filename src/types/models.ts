@@ -11,7 +11,8 @@ export interface Todo {
 export interface FetchTodosLastKey {
   id: string;
   type: string;
-  createdDate: string;
+  createdDate?: string;
+  dueDate?: string;
 }
 
 export class HttpError extends Error {

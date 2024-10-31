@@ -45,7 +45,7 @@ function fetchTodos(lastKey, completed, limit, sortBy) {
             if (result.Items != undefined && result.Items.length > 0) {
                 return {
                     data: result.Items.map((item) => (0, util_dynamodb_1.unmarshall)(item)),
-                    lastEvaluatedKey: result.LastEvaluatedKey
+                    lastKey: result.LastEvaluatedKey
                         ? (0, util_dynamodb_1.unmarshall)(result.LastEvaluatedKey)
                         : null,
                     status: enums_1.ResponseStatus.SUCCESS,
@@ -54,7 +54,7 @@ function fetchTodos(lastKey, completed, limit, sortBy) {
             else {
                 return {
                     data: [],
-                    lastEvaluatedKey: undefined,
+                    lastKey: undefined,
                     status: enums_1.ResponseStatus.SUCCESSEMPTY,
                 };
             }
