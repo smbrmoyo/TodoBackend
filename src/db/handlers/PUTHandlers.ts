@@ -8,6 +8,7 @@ import { ResponseStatus } from "../../types/enums";
 import { TodoResponse } from "../../types/responses";
 import { dynamoDBClient } from "../db";
 import { DEFAULTTODO } from "../../types/defaultValues";
+import { DynamoDBError } from "../../types/models";
 
 /**
  * Updates a Todo in the DynamoDB table "TodoTable".
@@ -60,7 +61,10 @@ export async function updateTodo(
     return {
       data: DEFAULTTODO,
       status: ResponseStatus.FAILURE,
-      error: (error as Error).message,
+      error: {
+        statusCode: (error as DynamoDBError).$metadata?.httpStatusCode || 400,
+        message: (error as DynamoDBError).message || "Unknown Error.",
+      },
     };
   }
 }

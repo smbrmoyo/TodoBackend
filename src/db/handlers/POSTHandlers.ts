@@ -2,7 +2,7 @@ import { PutItemCommandInput, PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 
 import { ResponseStatus } from "../../types/enums";
-import { Todo } from "../../types/models";
+import { DynamoDBError, Todo } from "../../types/models";
 import { TodoResponse } from "../../types/responses";
 import { dynamoDBClient } from "../db";
 import { DEFAULTTODO } from "../../types/defaultValues";
@@ -56,7 +56,10 @@ export async function createTodo(
     return {
       data: DEFAULTTODO,
       status: ResponseStatus.FAILURE,
-      error: (error as Error).message,
+      error: {
+        statusCode: (error as DynamoDBError).$metadata?.httpStatusCode || 400,
+        message: (error as DynamoDBError).message || "Unknown Error.",
+      },
     };
   }
 }

@@ -3,7 +3,7 @@ import { Todo } from "./models";
 
 export interface FetchTodosResponse {
   data: Todo[];
-  lastEvaluatedKey?: any;
+  lastEvaluatedKey?: {};
   status: ResponseStatus;
   error?: any;
 }

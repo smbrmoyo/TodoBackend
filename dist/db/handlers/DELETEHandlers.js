@@ -30,7 +30,10 @@ function deleteTodo(id) {
             console.log("Error deleting Todo:\n", error);
             return {
                 status: enums_1.ResponseStatus.FAILURE,
-                error: error.message,
+                error: {
+                    statusCode: 404,
+                    message: error.message,
+                },
             };
         }
     });

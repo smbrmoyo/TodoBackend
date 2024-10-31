@@ -9,7 +9,7 @@ import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 import { ResponseStatus } from "../../types/enums";
 import { FetchTodosResponse, TodoResponse } from "../../types/responses";
 import { dynamoDBClient } from "../db";
-import { HttpError, Todo } from "../../types/models";
+import { DynamoDBError, Todo } from "../../types/models";
 import { DEFAULTTODO } from "../../types/defaultValues";
 
 /**
@@ -27,7 +27,7 @@ export async function fetchTodos(
 ): Promise<FetchTodosResponse> {
   const params: QueryCommandInput = {
     TableName: "TodoTable",
-    Limit: 100,
+    Limit: 2,
     ExclusiveStartKey: lastKey == "" ? undefined : lastKey,
     ScanIndexForward: sortBy?.startsWith(" ") ?? undefined,
   };
@@ -68,7 +68,10 @@ export async function fetchTodos(
     return {
       data: [],
       status: ResponseStatus.FAILURE,
-      error: error,
+      error: {
+        statusCode: (error as DynamoDBError).$metadata?.httpStatusCode || 400,
+        message: (error as DynamoDBError).message || "Unknown Error.",
+      },
     };
   }
 }
@@ -109,8 +112,8 @@ export async function getTodoById(id: string): Promise<TodoResponse> {
       data: DEFAULTTODO,
       status: ResponseStatus.FAILURE,
       error: {
-        statusCode: 404,
-        message: (error as Error).message,
+        statusCode: (error as DynamoDBError).$metadata?.httpStatusCode || 400,
+        message: (error as DynamoDBError).message || "Unknown Error.",
       },
     };
   }

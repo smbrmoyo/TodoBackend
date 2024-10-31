@@ -21,7 +21,7 @@ function fetchTodos(lastKey, completed, sortBy) {
         var _a;
         const params = {
             TableName: "TodoTable",
-            Limit: 20,
+            Limit: 2,
             ExclusiveStartKey: lastKey == "" ? undefined : lastKey,
             ScanIndexForward: (_a = sortBy === null || sortBy === void 0 ? void 0 : sortBy.startsWith(" ")) !== null && _a !== void 0 ? _a : undefined,
         };

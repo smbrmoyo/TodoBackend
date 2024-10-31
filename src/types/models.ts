@@ -8,6 +8,8 @@ export interface Todo {
   completed: string;
 }
 
+export interface LastKey {}
+
 export class HttpError extends Error {
   public statusCode: number;
 
@@ -16,4 +18,11 @@ export class HttpError extends Error {
     this.statusCode = statusCode;
     Object.setPrototypeOf(this, HttpError.prototype);
   }
+}
+
+export interface DynamoDBError {
+  message: string;
+  $metadata: {
+    httpStatusCode: number;
+  };
 }

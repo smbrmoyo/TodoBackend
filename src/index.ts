@@ -12,7 +12,6 @@ import { createTodoTable } from "./db/handlers/tableHandlers";
 import { createTodo } from "./db/handlers/POSTHandlers";
 import { updateTodo } from "./db/handlers/PUTHandlers";
 import { deleteTodo } from "./db/handlers/DELETEHandlers";
-import { errorHandler } from "./utils/errorHandling";
 import { HttpError } from "./types/models";
 
 const app: Express = express();
@@ -20,7 +19,6 @@ const port = process.env.PORT || 3000;
 const httpServer = createServer(app);
 
 app.use(express.json());
-app.use(errorHandler);
 
 (async () => {
   try {

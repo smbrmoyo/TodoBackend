@@ -7,6 +7,7 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 import { ResponseStatus } from "../../types/enums";
 import { dynamoDBClient } from "../db";
 import { DeleteTodoResponse } from "../../types/responses";
+import { DynamoDBError } from "../../types/models";
 
 /**
  * Deletes a Todo from the DynamoDB table "TodoTable" by ID.
@@ -18,6 +19,7 @@ export async function deleteTodo(id: string): Promise<DeleteTodoResponse> {
   const params: DeleteItemCommandInput = {
     TableName: "TodoTable",
     Key: marshall({ id }),
+    ConditionExpression: "attribute_exists(id)",
   };
 
   try {
@@ -31,7 +33,10 @@ export async function deleteTodo(id: string): Promise<DeleteTodoResponse> {
 
     return {
       status: ResponseStatus.FAILURE,
-      error: (error as Error).message,
+      error: {
+        statusCode: (error as DynamoDBError).$metadata?.httpStatusCode || 400,
+        message: (error as DynamoDBError).message || "Unknown Error.",
+      },
     };
   }
 }
